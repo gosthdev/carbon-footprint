@@ -7,8 +7,9 @@ WORKDIR /app
 # Copiar package.json y package-lock.json
 COPY backend/package*.json ./
 
-# Instalar dependencias
-RUN npm ci --only=production
+# Instalar dependencias (usar omit=dev en npm moderno)
+# --no-audit --no-fund --prefer-offline para acelerar y reducir I/O
+RUN npm ci --omit=dev --no-audit --no-fund --prefer-offline
 
 # Copiar código fuente
 COPY backend/ ./

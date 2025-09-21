@@ -44,6 +44,7 @@ services:
       - /app/node_modules
     networks:
       - carbon_network
+    user: root
     command: npm run dev
 
   # Frontend (opcional para desarrollo)
@@ -63,6 +64,7 @@ services:
       - /app/node_modules
     networks:
       - carbon_network
+    user: root
 
 volumes:
   postgres_data:

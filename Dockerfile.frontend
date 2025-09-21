@@ -7,8 +7,8 @@ WORKDIR /app
 # Copiar package.json y package-lock.json
 COPY frontend/package*.json ./
 
-# Instalar dependencias
-RUN npm ci
+# Instalar dependencias (reduce trabajo de red y auditoría)
+RUN npm ci --no-audit --no-fund --prefer-offline
 
 # Copiar código fuente
 COPY frontend/ ./

@@ -19,8 +19,29 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet());
 
 // CORS
+// CORS: en desarrollo permitimos algunos orígenes comunes (localhost, 127.0.0.1,
+// y la subred de Docker que suele usar Vite cuando expone network). En producción
+// usamos la URL definida en FRONTEND_URL.
+const allowedFrontend = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://127.0.0.1:5173'
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Si no hay origin (herramientas como curl), permitir
+    if (!origin) return callback(null, true);
+
+    // Aceptar orígenes explícitos en la lista
+    if (allowedFrontend.includes(origin)) return callback(null, true);
+
+    // Aceptar orígenes que vienen de la red interna de docker-compose (ej. 172.19.*)
+    // útil cuando Vite muestra "Network: http://172.19.x.x:5173" y el navegador usa esa URL
+    if (origin.startsWith('http://172.')) return callback(null, true);
+
+    // En producción o si no aplica, rechazar
+    return callback(new Error('Origin not allowed by CORS'), false);
+  },
   credentials: true
 }));
 
