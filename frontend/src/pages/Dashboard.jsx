@@ -40,7 +40,7 @@ export default function Dashboard() {
 
   const quickActions = [
     {
-      title: 'Nueva Calculación',
+      title: 'Nuevo Cálculo',
       description: 'Calcula tu huella de carbono actual',
       icon: Calculator,
       link: '/calculate',
