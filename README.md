@@ -52,8 +52,8 @@ Frontend
 bash
 
 cd frontend
-# Crear archivo .env.local
-echo "VITE_API_URL=http://localhost:3000/api" > .env.local
+# Crear archivo .env
+echo "VITE_API_URL=http://localhost:3000/api" > .env
 
 3. Opción A: Desarrollo con Docker (Recomendado)
 bash
