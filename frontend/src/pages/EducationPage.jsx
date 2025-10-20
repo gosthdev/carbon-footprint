@@ -80,38 +80,30 @@ export default function EducationPage() {
   };
 
   if (selectedContent) {
+    const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const baseURL = API_BASE_URL.replace('/api', '');
+    
     return (
-      <div className="max-w-4xl mx-auto space-y-6">
+      <div className="max-w-6xl mx-auto space-y-6">
         {/* Botón volver */}
         <button
           onClick={() => setSelectedContent(null)}
-          className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 font-medium"
+          className="flex items-center space-x-2 text-primary-600 hover:text-primary-700 font-medium transition-colors"
         >
           <span>←</span>
           <span>Volver al listado</span>
         </button>
 
-        {/* Contenido seleccionado */}
-        <article className="card">
-          <div className="mb-6">
-            <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-sm font-medium rounded-full mb-3">
-              {getCategoryDisplayName(selectedContent.categoria)}
-            </span>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              {selectedContent.titulo}
-            </h1>
-            <div className="flex items-center space-x-2 text-sm text-gray-500">
-              <Calendar className="h-4 w-4" />
-              <span>Publicado el {formatDate(selectedContent.fecha_publicacion)}</span>
-            </div>
+        {/* Imagen infografía - Full size */}
+        {selectedContent.imagen_url && (
+          <div className="rounded-lg overflow-hidden bg-gray-100">
+            <img
+              src={`${baseURL}${selectedContent.imagen_url}`}
+              alt={selectedContent.titulo}
+              className="w-full h-auto object-contain"
+            />
           </div>
-          
-          <div className="prose max-w-none">
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-              {selectedContent.texto}
-            </p>
-          </div>
-        </article>
+        )}
       </div>
     );
   }
@@ -172,37 +164,55 @@ export default function EducationPage() {
         </div>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {content.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleContentClick(item)}
-              className="card hover:shadow-md transition-shadow cursor-pointer group"
-            >
-              <div className="mb-4">
-                <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded-full mb-3">
-                  {getCategoryDisplayName(item.categoria)}
-                </span>
-                <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
-                  {item.titulo}
-                </h3>
-              </div>
-              
-              <p className="text-gray-600 text-sm mb-4 line-clamp-3">
-                {item.texto.substring(0, 150)}...
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2 text-xs text-gray-500">
-                  <Calendar className="h-3 w-3" />
-                  <span>{formatDate(item.fecha_publicacion)}</span>
+          {content.map((item) => {
+            const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+            const baseURL = API_BASE_URL.replace('/api', '');
+            
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleContentClick(item)}
+                className="card hover:shadow-md transition-shadow cursor-pointer group overflow-hidden flex flex-col h-full"
+              >
+                {/* Imagen si existe */}
+                {item.imagen_url && (
+                  <div className="mb-4 -mx-4 -mt-4 h-40 bg-gray-200 overflow-hidden">
+                    <img
+                      src={`${baseURL}${item.imagen_url}`}
+                      alt={item.titulo}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
+
+                <div className="flex flex-col flex-grow">
+                  <div className="mb-4">
+                    <span className="inline-block px-3 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded-full mb-3">
+                      {getCategoryDisplayName(item.categoria)}
+                    </span>
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2">
+                      {item.titulo}
+                    </h3>
+                  </div>
+                  
+                  <p className="text-gray-600 text-sm mb-4 line-clamp-3 flex-grow">
+                    {item.texto.substring(0, 150)}...
+                  </p>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2 text-xs text-gray-500">
+                      <Calendar className="h-3 w-3" />
+                      <span>{formatDate(item.fecha_publicacion)}</span>
+                    </div>
+                    <div className="flex items-center space-x-1 text-primary-600 group-hover:text-primary-700 transition-colors">
+                      <Eye className="h-4 w-4" />
+                      <span className="text-sm font-medium">Leer más</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-1 text-primary-600 group-hover:text-primary-700 transition-colors">
-                  <Eye className="h-4 w-4" />
-                  <span className="text-sm font-medium">Leer más</span>
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

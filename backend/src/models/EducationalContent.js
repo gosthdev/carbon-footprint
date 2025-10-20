@@ -26,6 +26,11 @@ const EducationalContent = sequelize.define('EducationalContent', {
   activo: {
     type: DataTypes.BOOLEAN,
     defaultValue: true
+  },
+  imagen_url: {
+    type: DataTypes.STRING(500),
+    allowNull: true,
+    comment: 'URL de la imagen que ilustra el contenido'
   }
 }, {
   tableName: 'educational_content',

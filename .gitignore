@@ -1,24 +1,65 @@
+# Archivos temporales y de respaldo
 *.bak
 *.tmp
 *.swp
 *.swo
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# IDEs
 .vscode/
 .idea/
 *.code-workspace
+*.sublime-workspace
+*.sublime-project
 
+# Cobertura de pruebas
 *.cover
 *.py,cover
 .cache
 .pytest_cache/
+coverage/
+.nyc_output/
 
+# Dependencias
 backend/node_modules/
 backend/package-lock.json
-backend/.env
 frontend/node_modules/
-frontend/.env.local
+frontend/package-lock.json
 /package-lock.json
 
+# Variables de entorno personales (NO excluir .example)
+backend/.env
+backend/.env.local
+backend/.env.*.local
+frontend/.env
+frontend/.env.local
+frontend/.env.*.local
+
+# Sistema operativo
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Bases de datos locales
+*.sqlite
+*.sqlite3
+*.db
+
+# Construcción y distribución
+build/
+dist/
+*.jar
+*.war
+
+# Directorio de caché
+.cache/
+.eslintcache
+
+# Archivos de bloqueo del sistema
+Thumbs.db
+.Thumbs.db
+
 

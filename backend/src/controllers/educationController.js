@@ -18,7 +18,7 @@ class EducationController {
         order: [['fecha_publicacion', 'DESC']],
         limit,
         offset,
-        attributes: ['id', 'titulo', 'texto', 'categoria', 'fecha_publicacion']
+        attributes: ['id', 'titulo', 'texto', 'categoria', 'fecha_publicacion', 'imagen_url']
       });
 
       const totalPages = Math.ceil(count / limit);
@@ -47,7 +47,7 @@ class EducationController {
 
       const content = await EducationalContent.findOne({
         where: { id, activo: true },
-        attributes: ['id', 'titulo', 'texto', 'categoria', 'fecha_publicacion']
+        attributes: ['id', 'titulo', 'texto', 'categoria', 'fecha_publicacion', 'imagen_url']
       });
 
       if (!content) {
