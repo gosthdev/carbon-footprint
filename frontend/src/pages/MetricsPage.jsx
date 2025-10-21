@@ -9,6 +9,19 @@ export default function MetricsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const getCategoryDisplayName = (category) => {
+    const categoryMap = {
+      'conceptos_basicos': 'Conceptos Básicos',
+      'transporte': 'Transporte',
+      'energia': 'Energía',
+      'alimentacion': 'Alimentación',
+      'residuos': 'Residuos',
+      'compensacion': 'Compensación',
+      'general': 'General'
+    };
+    return categoryMap[category] || category;
+  };
+
   useEffect(() => {
     fetchAllMetrics();
   }, []);

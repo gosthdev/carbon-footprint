@@ -1,25 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { carbonAPI } from '../api/api';
+import { Link, useLocation } from 'react-router-dom';
+import { carbonAPI, metricsAPI } from '../api/api';
 import { useAuth } from '../context/AuthContext';
-import { Calculator, TrendingUp, TrendingDown, BarChart3, BookOpen, Calendar } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Globe, Calendar } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const location = useLocation();
   const [stats, setStats] = useState(null);
   const [progress, setProgress] = useState(null);
+  const [globalMetrics, setGlobalMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [statsResponse, progressResponse] = await Promise.all([
+        const [statsResponse, progressResponse, metricsResponse] = await Promise.all([
           carbonAPI.getStats(),
-          carbonAPI.getProgress()
+          carbonAPI.getProgress(),
+          metricsAPI.getDashboardMetrics()
         ]);
         
         setStats(statsResponse.data.stats);
         setProgress(progressResponse.data.progress);
+        setGlobalMetrics(metricsResponse.data.dashboard_metrics);
       } catch (error) {
         console.error('Error cargando dashboard:', error);
       } finally {
@@ -30,6 +34,13 @@ export default function Dashboard() {
     fetchDashboardData();
   }, []);
 
+  const handleDashboardRefresh = (e) => {
+    if (location.pathname === '/dashboard') {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">
@@ -37,30 +48,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  const quickActions = [
-    {
-      title: 'Nuevo Cálculo',
-      description: 'Calcula tu huella de carbono actual',
-      icon: Calculator,
-      link: '/calculate',
-      color: 'bg-blue-500 hover:bg-blue-600'
-    },
-    {
-      title: 'Ver Historial',
-      description: 'Revisa tus cálculos anteriores',
-      icon: BarChart3,
-      link: '/history',
-      color: 'bg-purple-500 hover:bg-purple-600'
-    },
-    {
-      title: 'Contenido Educativo',
-      description: 'Aprende sobre sostenibilidad',
-      icon: BookOpen,
-      link: '/education',
-      color: 'bg-green-500 hover:bg-green-600'
-    }
-  ];
 
   return (
     <div className="space-y-8">
@@ -99,7 +86,31 @@ export default function Dashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 gap-6">
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Tu Huella Promedio</p>
+              <p className="text-2xl font-bold text-gray-900">{stats?.average_footprint || 0}</p>
+              <p className="text-xs text-gray-500">kg CO2e/año</p>
+            </div>
+            <BarChart3 className="h-8 w-8 text-green-500" />
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600">Promedio Global</p>
+              <p className="text-2xl font-bold text-gray-900">{globalMetrics?.average_footprint || 0}</p>
+              <p className="text-xs text-gray-500">kg CO2e/año (todos los usuarios)</p>
+            </div>
+            <Globe className="h-8 w-8 text-blue-500" />
+          </div>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-2 gap-6">
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
@@ -113,49 +124,12 @@ export default function Dashboard() {
         <div className="card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Huella Promedio</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.average_footprint || 0}</p>
-              <p className="text-xs text-gray-500">kg CO2e/año</p>
+              <p className="text-sm font-medium text-gray-600">Cálculos Globales</p>
+              <p className="text-2xl font-bold text-gray-900">{globalMetrics?.total_calculations || 0}</p>
+              <p className="text-xs text-gray-500">de todos los usuarios</p>
             </div>
-            <BarChart3 className="h-8 w-8 text-green-500" />
+            <BarChart3 className="h-8 w-8 text-purple-500" />
           </div>
-        </div>
-
-        <div className="card">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Mejor Resultado</p>
-              <p className="text-2xl font-bold text-gray-900">{stats?.min_footprint || 0}</p>
-              <p className="text-xs text-gray-500">kg CO2e/año</p>
-            </div>
-            <TrendingDown className="h-8 w-8 text-primary-500" />
-          </div>
-        </div>
-      </div>
-
-      {/* Quick Actions */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Acciones Rápidas</h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {quickActions.map(({ title, description, icon: Icon, link, color }, index) => (
-            <Link
-              key={index}
-              to={link}
-              className="card hover:shadow-md transition-shadow cursor-pointer group"
-            >
-              <div className="flex items-center space-x-4">
-                <div className={`p-3 rounded-lg ${color} transition-colors`}>
-                  <Icon className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-                    {title}
-                  </h3>
-                  <p className="text-sm text-gray-600">{description}</p>
-                </div>
-              </div>
-            </Link>
-          ))}
         </div>
       </div>
 
@@ -163,7 +137,6 @@ export default function Dashboard() {
       {(!stats || stats.total_calculations === 0) && (
         <div className="card border-primary-200 bg-primary-50">
           <div className="text-center">
-            <Calculator className="h-12 w-12 text-primary-600 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               ¡Bienvenido a CarbonTrack!
             </h3>
@@ -174,7 +147,6 @@ export default function Dashboard() {
               to="/calculate"
               className="btn-primary inline-flex items-center space-x-2"
             >
-              <Calculator className="h-4 w-4" />
               <span>Realizar Primera Calculación</span>
             </Link>
           </div>

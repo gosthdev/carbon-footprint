@@ -23,6 +23,13 @@ export default function Layout({ children }) {
 
   const isActivePath = (path) => location.pathname === path;
 
+  const handleNavClick = (path) => (e) => {
+    if (isActivePath(path)) {
+      e.preventDefault();
+      window.location.reload();
+    }
+  };
+
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -38,7 +45,11 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             {/* Logo */}
-            <Link to="/dashboard" className="flex items-center space-x-2">
+            <Link 
+              to="/dashboard" 
+              onClick={handleNavClick('/dashboard')}
+              className="flex items-center space-x-2"
+            >
               <Leaf className="h-8 w-8 text-primary-600" />
               <span className="text-xl font-bold text-gray-900">CarbonTrack</span>
             </Link>
@@ -49,6 +60,7 @@ export default function Layout({ children }) {
                 <Link
                   key={path}
                   to={path}
+                  onClick={handleNavClick(path)}
                   className={`flex items-center space-x-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                     isActivePath(path)
                       ? 'text-primary-600 bg-primary-50'
@@ -85,6 +97,7 @@ export default function Layout({ children }) {
               <Link
                 key={path}
                 to={path}
+                onClick={handleNavClick(path)}
                 className={`flex items-center space-x-2 px-3 py-2 rounded-md text-base font-medium transition-colors ${
                   isActivePath(path)
                     ? 'text-primary-600 bg-primary-50'
