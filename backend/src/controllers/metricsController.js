@@ -5,21 +5,7 @@ class MetricsController {
   static async getActiveUsers(req, res) {
     try {
       const now = new Date();
-      
-      // Usuarios activos última semana
-      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const weeklyActiveUsers = await User.count({
-        include: [{
-          model: CarbonCalculation,
-          where: {
-            fecha: {
-              [Op.gte]: oneWeekAgo
-            }
-          },
-          required: true
-        }]
-      });
-
+            
       // Usuarios activos último mes
       const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       const monthlyActiveUsers = await User.count({
@@ -37,16 +23,7 @@ class MetricsController {
       // Total de usuarios registrados
       const totalUsers = await User.count();
 
-      // Usuarios que se registraron esta semana
-      const newUsersThisWeek = await User.count({
-        where: {
-          fecha_registro: {
-            [Op.gte]: oneWeekAgo
-          }
-        }
-      });
-
-      // Usuarios que se registraron este mes
+          // Usuarios que se registraron este mes
       const newUsersThisMonth = await User.count({
         where: {
           fecha_registro: {
@@ -55,13 +32,56 @@ class MetricsController {
         }
       });
 
+      // --- LÓGICA DE PORCENTAJE DE REDUCCIÓN DE HUELLA ---
+
+      // 1. Obtener solo los usuarios que tienen 2 o más cálculos
+      const usersWithMultipleCalcs = await CarbonCalculation.findAll({
+        attributes: [
+            'user_id',
+            [CarbonCalculation.sequelize.fn('COUNT', CarbonCalculation.sequelize.col('id')), 'total_calcs']
+        ],
+        group: ['user_id'],
+        having: CarbonCalculation.sequelize.literal('COUNT(id) >= 2') // Filtra solo si hay 2 o más
+      });
+
+      // Contar usuarios que redujeron su huella
+      let usersReducedCount = 0;
+
+      // 2. Iterar y comparar: Último cálculo vs. Primer cálculo
+      for (const user of usersWithMultipleCalcs) {
+          const userId = user.user_id;
+          
+          // El primer cálculo (orden ascendente por fecha)
+          const firstCalc = await CarbonCalculation.findOne({
+              where: { user_id: userId },
+              order: [['fecha', 'ASC']],
+              attributes: ['resultado']
+          });
+
+          // El último cálculo (orden descendente por fecha)
+          const lastCalc = await CarbonCalculation.findOne({
+              where: { user_id: userId },
+              order: [['fecha', 'DESC']],
+              attributes: ['resultado']
+          });
+
+          // Comparar resultados (usamos parseFloat para asegurar comparación numérica)
+          if (parseFloat(lastCalc.resultado) < parseFloat(firstCalc.resultado)) {
+              usersReducedCount++;
+          }
+      }
+      
+      // El porcentaje se calcula sobre el total de usuarios registrados (totalUsers)
+      const percentageReducedFootprint = totalUsers > 0 
+          ? ((usersReducedCount / totalUsers) * 100).toFixed(2) 
+          : 0;
+
       res.json({
         metrics: {
-          weekly_active_users: weeklyActiveUsers,
-          monthly_active_users: monthlyActiveUsers,
           total_users: totalUsers,
-          new_users_this_week: newUsersThisWeek,
-          new_users_this_month: newUsersThisMonth
+          monthly_active_users: monthlyActiveUsers, 
+          new_users_this_month: newUsersThisMonth,  
+          percentage_reduced_footprint: parseFloat(percentageReducedFootprint),
         }
       });
     } catch (error) {
@@ -76,29 +96,7 @@ class MetricsController {
     try {
       const now = new Date();
       const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
-
-      // Usuarios que han consultado al menos un contenido en los últimos 6 meses
-      const usersWithContentViews = await User.count({
-        include: [{
-          model: ContentView,
-          where: {
-            fecha: {
-              [Op.gte]: sixMonthsAgo
-            }
-          },
-          required: true
-        }]
-      });
-
-      // Total de visualizaciones de contenido en los últimos 6 meses
-      const totalContentViews = await ContentView.count({
-        where: {
-          fecha: {
-            [Op.gte]: sixMonthsAgo
-          }
-        }
-      });
-
+      
       // Contenido más visto en los últimos 6 meses
       const topContent = await ContentView.findAll({
         where: {
@@ -119,16 +117,28 @@ class MetricsController {
         limit: 5
       });
 
+      // Métrica: Proporción de usuarios que consultan contenido
+      const totalUsers = await User.count();
+      
+      const viewersCount = await ContentView.count({
+        distinct: true,
+        col: 'user_id'
+      });
+
+      const proportionContentUsers = totalUsers > 0
+          ? ((viewersCount / totalUsers) * 100).toFixed(2)
+          : 0;
+
       res.json({
         content_metrics: {
-          users_with_content_views_6_months: usersWithContentViews,
-          total_content_views_6_months: totalContentViews,
+          // total_content_views_6_months ELIMINADO
           top_content: topContent.map(item => ({
             content_id: item.content_id,
             titulo: item.EducationalContent.titulo,
             categoria: item.EducationalContent.categoria,
             views: parseInt(item.dataValues.views)
-          }))
+          })),
+          proportion_content_users: parseFloat(proportionContentUsers)
         }
       });
     } catch (error) {
@@ -142,21 +152,10 @@ class MetricsController {
   static async getDashboardMetrics(req, res) {
     try {
       const now = new Date();
-      const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
 
       // Total de cálculos realizados
       const totalCalculations = await CarbonCalculation.count();
-      
-      // Cálculos esta semana
-      const calculationsThisWeek = await CarbonCalculation.count({
-        where: {
-          fecha: {
-            [Op.gte]: oneWeekAgo
-          }
-        }
-      });
-
+            
       // Promedio general de huella de carbono
       const avgFootprint = await CarbonCalculation.findOne({
         attributes: [
@@ -167,7 +166,6 @@ class MetricsController {
       res.json({
         dashboard_metrics: {
           total_calculations: totalCalculations,
-          calculations_this_week: calculationsThisWeek,
           average_footprint: avgFootprint ? parseFloat(avgFootprint.dataValues.promedio).toFixed(2) : 0
         }
       });

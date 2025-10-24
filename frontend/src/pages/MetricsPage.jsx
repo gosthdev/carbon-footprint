@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { metricsAPI } from '../api/api';
-import { Users, BookOpen, BarChart3, TrendingUp, Calendar, Eye } from 'lucide-react';
+import { Users, BookOpen, TrendingUp, TrendingDown, Eye } from 'lucide-react';
+
+const getCategoryDisplayName = (category) => {
+    if (category === 'transporte') return 'Transporte';
+    if (category === 'energia') return 'Energía';
+    if (category === 'agua') return 'Agua';
+    if (category === 'residuos') return 'Residuos';
+    if (category === 'alimentacion') return 'Alimentación';
+    return category;
+};
 
 export default function MetricsPage() {
   const [activeUsersMetrics, setActiveUsersMetrics] = useState(null);
   const [contentMetrics, setContentMetrics] = useState(null);
-  const [dashboardMetrics, setDashboardMetrics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -29,15 +37,13 @@ export default function MetricsPage() {
   const fetchAllMetrics = async () => {
     try {
       setLoading(true);
-      const [activeUsersResponse, contentResponse, dashboardResponse] = await Promise.all([
+      const [activeUsersResponse, contentResponse] = await Promise.all([
         metricsAPI.getActiveUsers(),
         metricsAPI.getContentMetrics(),
-        metricsAPI.getDashboardMetrics()
       ]);
 
       setActiveUsersMetrics(activeUsersResponse.data.metrics);
       setContentMetrics(contentResponse.data.content_metrics);
-      setDashboardMetrics(dashboardResponse.data.dashboard_metrics);
     } catch (error) {
       setError('Error al cargar métricas');
       console.error('Error:', error);
@@ -66,46 +72,32 @@ export default function MetricsPage() {
 
   const userMetricCards = [
     {
-      title: 'Usuarios Activos (Semana)',
-      value: activeUsersMetrics?.weekly_active_users || 0,
-      icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100'
-    },
-    {
-      title: 'Usuarios Activos (Mes)',
-      value: activeUsersMetrics?.monthly_active_users || 0,
-      icon: Users,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100'
-    },
-    {
-      title: 'Total Usuarios',
+      title: 'Cantidad de Usuarios Registrados',
       value: activeUsersMetrics?.total_users || 0,
       icon: Users,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100'
     },
     {
-      title: 'Nuevos (Semana)',
-      value: activeUsersMetrics?.new_users_this_week || 0,
+      title: 'Cantidad de Usuarios Activos este mes',
+      value: activeUsersMetrics?.monthly_active_users || 0,
+      icon: Users,
+      color: 'text-blue-600',
+      bgColor: 'bg-blue-100'
+    },
+    {
+      title: 'Cantidad de Usuarios Nuevos este mes',
+      value: activeUsersMetrics?.new_users_this_month || 0,
       icon: TrendingUp,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-100'
     },
     {
-      title: 'Nuevos (Mes)',
-      value: activeUsersMetrics?.new_users_this_month || 0,
-      icon: TrendingUp,
-      color: 'text-teal-600',
-      bgColor: 'bg-teal-100'
-    },
-    {
-      title: 'Total Cálculos',
-      value: dashboardMetrics?.total_calculations || 0,
-      icon: BarChart3,
-      color: 'text-indigo-600',
-      bgColor: 'bg-indigo-100'
+      title: '% Usuarios que redujeron su huella (respecto al primer registro)',
+      value: `${activeUsersMetrics?.percentage_reduced_footprint || 0}%`,
+      icon: TrendingDown,
+      color: 'text-primary-600',
+      bgColor: 'bg-primary-100'
     }
   ];
 
@@ -115,7 +107,7 @@ export default function MetricsPage() {
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Panel de Métricas</h1>
         <p className="text-gray-600">
-          Estadísticas de uso y engagement de la plataforma
+          Estadísticas de la plataforma
         </p>
       </div>
 
@@ -125,7 +117,7 @@ export default function MetricsPage() {
           <Users className="h-5 w-5" />
           <span>Métricas de Usuarios</span>
         </h2>
-        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
           {userMetricCards.map(({ title, value, icon: Icon, color, bgColor }, index) => (
             <div key={index} className="card">
               <div className="flex items-center justify-between">
@@ -148,36 +140,20 @@ export default function MetricsPage() {
           <BookOpen className="h-5 w-5" />
           <span>Métricas de Contenido Educativo</span>
         </h2>
-        
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
+    
+        <div className="grid md:grid-cols-1 gap-6 mb-6"> 
           <div className="card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600 mb-1">
-                  Usuarios que consultaron contenido (6 meses)
+                  Proporción de Usuarios que consultan contenido
                 </p>
                 <p className="text-3xl font-bold text-gray-900">
-                  {contentMetrics?.users_with_content_views_6_months || 0}
+                  {contentMetrics?.proportion_content_users || 0}%
                 </p>
               </div>
-              <div className="p-3 rounded-lg bg-green-100">
-                <Eye className="h-6 w-6 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  Total visualizaciones (6 meses)
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {contentMetrics?.total_content_views_6_months || 0}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-blue-100">
-                <BarChart3 className="h-6 w-6 text-blue-600" />
+              <div className="p-3 rounded-lg bg-yellow-100">
+                <BookOpen className="h-6 w-6 text-yellow-600" />
               </div>
             </div>
           </div>
@@ -186,8 +162,9 @@ export default function MetricsPage() {
         {/* Top contenido */}
         {contentMetrics?.top_content && contentMetrics.top_content.length > 0 && (
           <div className="card">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Contenido Más Consultado (6 meses)
+            <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center space-x-2">
+                <Eye className="h-5 w-5 text-green-600"/>
+                <span>Contenido Más Consultado (6 meses)</span>
             </h3>
             <div className="space-y-3">
               {contentMetrics.top_content.map((item, index) => (
@@ -212,107 +189,7 @@ export default function MetricsPage() {
         )}
       </div>
 
-      {/* Métricas generales */}
-      <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center space-x-2">
-          <BarChart3 className="h-5 w-5" />
-          <span>Métricas Generales</span>
-        </h2>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  Cálculos esta semana
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {dashboardMetrics?.calculations_this_week || 0}
-                </p>
-              </div>
-              <div className="p-3 rounded-lg bg-orange-100">
-                <Calendar className="h-6 w-6 text-orange-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">
-                  Huella promedio global
-                </p>
-                <p className="text-3xl font-bold text-gray-900">
-                  {dashboardMetrics?.average_footprint || 0}
-                </p>
-                <p className="text-xs text-gray-500">kg CO2e/año</p>
-              </div>
-              <div className="p-3 rounded-lg bg-red-100">
-                <BarChart3 className="h-6 w-6 text-red-600" />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Insights */}
-      <div className="card">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">📊 Insights de la Plataforma</h3>
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Engagement de Usuarios</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tasa de retención semanal:</span>
-                <span className="font-medium">
-                  {activeUsersMetrics?.total_users > 0 
-                    ? Math.round((activeUsersMetrics.weekly_active_users / activeUsersMetrics.total_users) * 100)
-                    : 0}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Tasa de retención mensual:</span>
-                <span className="font-medium">
-                  {activeUsersMetrics?.total_users > 0 
-                    ? Math.round((activeUsersMetrics.monthly_active_users / activeUsersMetrics.total_users) * 100)
-                    : 0}%
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Usuarios que leen contenido:</span>
-                <span className="font-medium">
-                  {activeUsersMetrics?.total_users > 0 
-                    ? Math.round((contentMetrics?.users_with_content_views_6_months / activeUsersMetrics.total_users) * 100)
-                    : 0}%
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-medium text-gray-900">Uso de la Plataforma</h4>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Cálculos por usuario activo:</span>
-                <span className="font-medium">
-                  {activeUsersMetrics?.weekly_active_users > 0 
-                    ? Math.round(dashboardMetrics?.total_calculations / activeUsersMetrics.weekly_active_users)
-                    : 0}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Visualizaciones por usuario:</span>
-                <span className="font-medium">
-                  {contentMetrics?.users_with_content_views_6_months > 0 
-                    ? Math.round(contentMetrics?.total_content_views_6_months / contentMetrics.users_with_content_views_6_months)
-                    : 0}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
+      
       {/* Botón de actualización */}
       <div className="text-center">
         <button
