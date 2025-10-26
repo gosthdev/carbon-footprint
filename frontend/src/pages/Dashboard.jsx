@@ -147,7 +147,7 @@ export default function Dashboard() {
               to="/calculate"
               className="btn-primary inline-flex items-center space-x-2"
             >
-              <span>Realizar Primera Calculación</span>
+              <span>Realizar Primer Cálculo</span>
             </Link>
           </div>
         </div>

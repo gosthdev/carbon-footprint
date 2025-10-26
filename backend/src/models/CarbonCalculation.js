@@ -16,13 +16,10 @@ const CarbonCalculation = sequelize.define('CarbonCalculation', {
       key: 'id'
     }
   },
-  transporte_terrestre: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  transporte_aereo: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
+  transporte_terrestre_data: {
+    type: DataTypes.JSON, // Usamos JSON para almacenar la estructura detallada de transporte
+    allowNull: false,
+    defaultValue: {}
   },
   consumo_energia: {
     type: DataTypes.DECIMAL(10, 2),
@@ -33,10 +30,6 @@ const CarbonCalculation = sequelize.define('CarbonCalculation', {
     defaultValue: 0
   },
   residuos: {
-    type: DataTypes.DECIMAL(10, 2),
-    defaultValue: 0
-  },
-  alimentacion: {
     type: DataTypes.DECIMAL(10, 2),
     defaultValue: 0
   },

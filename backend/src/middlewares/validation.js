@@ -43,16 +43,40 @@ const validateLogin = [
 ];
 
 const validateCarbonCalculation = [
-  body('transporte_terrestre')
+  // Nueva validación para el objeto de transporte_terrestre_data
+  body('transporte_terrestre_data')
+    .isObject()
+    .withMessage('El transporte terrestre debe ser un objeto'),
+  
+  // Tipos Públicos (deben ser numéricos y opcionales)
+  body('transporte_terrestre_data.tipos_publicos.custer')
     .optional()
     .isFloat({ min: 0 })
-    .withMessage('Transporte terrestre debe ser un número positivo'),
-  
-  body('transporte_aereo')
+    .withMessage('Cúster debe ser un número positivo'),
+  body('transporte_terrestre_data.tipos_publicos.combi')
     .optional()
     .isFloat({ min: 0 })
-    .withMessage('Transporte aéreo debe ser un número positivo'),
+    .withMessage('Combi debe ser un número positivo'),
+  body('transporte_terrestre_data.tipos_publicos.bus')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Bus debe ser un número positivo'),
+  body('transporte_terrestre_data.tipos_publicos.taxi')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Taxi debe ser un número positivo'),
+
+  // Transporte Personal (tipo y km)
+  body('transporte_terrestre_data.personal.tipo')
+    .isIn(['moto_mototaxi', 'auto_db5', 'auto_gasohol', 'auto_glp', 'auto_gnv', 'ninguno'])
+    .withMessage('Tipo de vehículo personal inválido'),
   
+  body('transporte_terrestre_data.personal.km')
+    .optional()
+    .isFloat({ min: 0 })
+    .withMessage('Kilometraje personal debe ser un número positivo'),
+
+  // Consumos directos (mantienen la estructura)
   body('consumo_energia')
     .optional()
     .isFloat({ min: 0 })
@@ -68,10 +92,7 @@ const validateCarbonCalculation = [
     .isFloat({ min: 0 })
     .withMessage('Residuos debe ser un número positivo'),
   
-  body('alimentacion')
-    .optional()
-    .isFloat({ min: 0 })
-    .withMessage('Alimentación debe ser un número positivo'),
+  // Eliminados: transporte_terrestre (antiguo), transporte_aereo, alimentacion
   
   handleValidationErrors
 ];

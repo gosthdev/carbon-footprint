@@ -9,6 +9,10 @@ class MetricsController {
       // Usuarios activos último mes
       const oneMonthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
       const monthlyActiveUsers = await User.count({
+        // 1. Usamos 'distinct: true' para contar solo usuarios únicos.
+        distinct: true, 
+        // 2. Especificamos la columna por la que queremos contar, que es el id del User.
+        col: 'id', 
         include: [{
           model: CarbonCalculation,
           where: {
@@ -16,7 +20,7 @@ class MetricsController {
               [Op.gte]: oneMonthAgo
             }
           },
-          required: true
+          required: true // Sigue siendo necesario para el INNER JOIN
         }]
       });
 

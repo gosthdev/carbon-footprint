@@ -14,12 +14,10 @@ class CarbonController {
       // Guardar en base de datos
       const savedCalculation = await CarbonCalculation.create({
         user_id: userId,
-        transporte_terrestre: inputData.transporte_terrestre || 0,
-        transporte_aereo: inputData.transporte_aereo || 0,
+        transporte_terrestre_data: inputData.transporte_terrestre_data,         
         consumo_energia: inputData.consumo_energia || 0,
         consumo_agua: inputData.consumo_agua || 0,
         residuos: inputData.residuos || 0,
-        alimentacion: inputData.alimentacion || 0,
         resultado: calculation.total
       });
 
@@ -57,9 +55,8 @@ class CarbonController {
         order: [['fecha', 'DESC']],
         limit,
         offset,
-        attributes: ['id', 'resultado', 'fecha', 'transporte_terrestre', 
-                    'transporte_aereo', 'consumo_energia', 'consumo_agua', 
-                    'residuos', 'alimentacion']
+        attributes: ['id', 'resultado', 'fecha', 'transporte_terrestre_data', 
+                     'consumo_energia', 'consumo_agua', 'residuos']
       });
 
       const totalPages = Math.ceil(count / limit);
@@ -67,6 +64,13 @@ class CarbonController {
       res.json({
         calculations: rows.map(calc => ({
           ...calc.dataValues,
+          // Calcular el desglose de emisiones anualizadas (aunque no se guarde)
+          desglose: CarbonService.calculateCarbonFootprint({ 
+              transporte_terrestre_data: calc.transporte_terrestre_data,
+              consumo_energia: calc.consumo_energia,
+              consumo_agua: calc.consumo_agua,
+              residuos: calc.residuos
+          }),
           categoria: CarbonService.getFootprintCategory(calc.resultado)
         })),
         pagination: {

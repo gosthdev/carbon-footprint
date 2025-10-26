@@ -76,7 +76,7 @@ export default function HistoryPage() {
             onClick={() => window.location.href = '/calculate'}
             className="btn-primary"
           >
-            Realizar Primera Calculación
+            Realizar Primer Cálculo
           </button>
         </div>
       </div>
@@ -168,31 +168,29 @@ export default function HistoryPage() {
               
               {/* Desglose compacto */}
               <div className="mt-3 pt-3 border-t border-gray-100">
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-2 text-xs">
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-2 text-xs"> {/* Ajuste el grid a 4 columnas */}
                   <div className="text-center">
                     <p className="text-gray-500">Transporte T.</p>
-                    <p className="font-medium">{calc.transporte_terrestre}</p>
+                    {/* Leemos de desglose.transporte_terrestre */}
+                    <p className="font-medium">{calc.desglose.transporte_terrestre.toFixed(2)}</p> 
                   </div>
-                  <div className="text-center">
-                    <p className="text-gray-500">Transporte A.</p>
-                    <p className="font-medium">{calc.transporte_aereo}</p>
-                  </div>
+                  {/* Eliminamos Transporte A. y Alimentación */}
                   <div className="text-center">
                     <p className="text-gray-500">Energía</p>
-                    <p className="font-medium">{calc.consumo_energia}</p>
+                    {/* Leemos de desglose.consumo_energia */}
+                    <p className="font-medium">{calc.desglose.consumo_energia.toFixed(2)}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-gray-500">Agua</p>
-                    <p className="font-medium">{calc.consumo_agua}</p>
+                    {/* Leemos de desglose.consumo_agua */}
+                    <p className="font-medium">{calc.desglose.consumo_agua.toFixed(2)}</p>
                   </div>
                   <div className="text-center">
                     <p className="text-gray-500">Residuos</p>
-                    <p className="font-medium">{calc.residuos}</p>
+                    {/* Leemos de desglose.residuos */}
+                    <p className="font-medium">{calc.desglose.residuos.toFixed(2)}</p>
                   </div>
-                  <div className="text-center">
-                    <p className="text-gray-500">Alimentación</p>
-                    <p className="font-medium">{calc.alimentacion}</p>
-                  </div>
+                  {/* Eliminamos Alimentación */}
                 </div>
               </div>
             </div>
