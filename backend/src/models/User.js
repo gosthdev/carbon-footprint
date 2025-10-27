@@ -23,6 +23,12 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING(255),
     allowNull: false
   },
+  rol: {
+    type: DataTypes.ENUM('usuario', 'administrador'),
+    defaultValue: 'usuario',
+    allowNull: false,
+    comment: 'Rol del usuario: usuario normal o administrador'
+  },
   fecha_registro: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW

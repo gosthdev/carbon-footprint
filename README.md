@@ -1,14 +1,16 @@
 🌱 CarbonTrack - Plataforma de Cálculo de Huella de Carbono
 
-Una plataforma web completa para calcular, monitorear y reducir la huella de carbono personal, con contenido educativo y métricas de uso.
+Una plataforma web completa para calcular, monitorear y reducir la huella de carbono personal, con contenido educativo, sistema de roles y métricas de uso.
 🎯 Características Principales
 
-    Registro y Autenticación: Sistema completo con JWT
+    Registro y Autenticación: Sistema completo con JWT y roles de usuario
+    Sistema de Roles: Administradores y usuarios regulares con permisos diferenciados
     Cálculo de Huella de Carbono: Algoritmo que considera transporte, energía, agua, residuos y alimentación
     Historial y Progreso: Visualización de la evolución temporal con gráficos
-    Contenido Educativo: Artículos categorizados sobre sostenibilidad
-    Panel de Métricas: Analytics de uso de la plataforma
+    Contenido Educativo: Infografías sobre sostenibilidad y reducción de huella
+    Panel de Métricas: Analytics de uso de la plataforma (solo administradores)
     Responsive Design: Interfaz optimizada para móviles y desktop
+    Autorización Granular: Control de acceso basado en roles
 
 🛠️ Tecnologías
 Backend
@@ -89,13 +91,42 @@ npm run dev
 Una vez que el backend esté corriendo:
 bash
 
-# Ejecutar migraciones
+# Ejecutar migraciones (crea tablas)
 npm run migrate
 
-# Insertar datos iniciales
-npm run seed
+# O migración forzada (recrea todas las tablas - ⚠️ elimina datos)
+npm run migrate:force
 
-📡 API Endpoints
+# Insertar datos iniciales
+npm run seed              # Contenido educativo (infografías)
+npm run seed:admins       # Crear administradores por defecto
+npm run seed:test-user    # Crear usuario de prueba
+
+� Credenciales por Defecto
+
+### Administradores
+```
+Email: admin@carbon-footprint.com
+Password: Admin123!@#
+Rol: administrador
+```
+
+```
+Email: admin2@carbon-footprint.com
+Password: Admin456!@#
+Rol: administrador
+```
+
+### Usuario de Prueba
+```
+Email: test@ejemplo.com
+Password: Test123!@#
+Rol: usuario
+```
+
+⚠️ **IMPORTANTE:** Cambia estas contraseñas después del primer login en producción.
+
+�📡 API Endpoints
 Autenticación
 
     POST /api/auth/register - Registro de usuario
@@ -115,11 +146,28 @@ Contenido Educativo
     GET /api/education/content/:id - Obtener contenido específico
     GET /api/education/categories - Obtener categorías
 
-Métricas
+Métricas (🔒 Solo Administradores)
 
     GET /api/metrics/active-users - Usuarios activos
     GET /api/metrics/content-users - Métricas de contenido
     GET /api/metrics/dashboard - Métricas generales
+
+🔐 Sistema de Roles
+
+### Usuario Regular (`rol: 'usuario'`)
+- ✅ Calcular y ver su propia huella de carbono
+- ✅ Ver su historial y progreso
+- ✅ Acceder a contenido educativo
+- ❌ **NO** puede ver métricas globales
+- ❌ **NO** puede acceder a `/metrics`
+
+### Administrador (`rol: 'administrador'`)
+- ✅ Todas las funciones de usuario regular
+- ✅ Ver métricas globales en el dashboard
+- ✅ Acceder a la página completa de Métricas
+- ✅ Ver estadísticas de todos los usuarios
+
+**Documentación completa:** Ver [`ROLES_IMPLEMENTATION.md`](./ROLES_IMPLEMENTATION.md)
 
 🧮 Fórmula de Cálculo
 
@@ -137,9 +185,9 @@ javascript
 📊 Estructura de Base de Datos
 Tablas principales:
 
-    users: Información de usuarios
+    users: Información de usuarios con campo `rol`
     carbon_calculations: Historial de cálculos
-    educational_content: Contenido educativo
+    educational_content: Contenido educativo (infografías)
     content_views: Registro de visualizaciones
 
 🎨 Características del Frontend

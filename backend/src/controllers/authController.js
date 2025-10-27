@@ -28,7 +28,11 @@ class AuthController {
 
       // Generar token
       const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { 
+          userId: user.id, 
+          email: user.email,
+          rol: user.rol 
+        },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
       );
@@ -39,6 +43,7 @@ class AuthController {
           id: user.id,
           nombre: user.nombre,
           email: user.email,
+          rol: user.rol,
           fecha_registro: user.fecha_registro
         },
         token
@@ -73,7 +78,11 @@ class AuthController {
 
       // Generar token
       const token = jwt.sign(
-        { userId: user.id, email: user.email },
+        { 
+          userId: user.id, 
+          email: user.email,
+          rol: user.rol 
+        },
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN }
       );
@@ -83,7 +92,8 @@ class AuthController {
         user: {
           id: user.id,
           nombre: user.nombre,
-          email: user.email
+          email: user.email,
+          rol: user.rol
         },
         token
       });
