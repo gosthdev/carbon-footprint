@@ -18,8 +18,12 @@ export default function Layout({ children }) {
     { path: '/calculate', label: 'Calcular', icon: Calculator },
     { path: '/history', label: 'Historial', icon: BarChart3 },
     { path: '/education', label: 'Educación', icon: BookOpen },
-    { path: '/metrics', label: 'Métricas', icon: BarChart3 },
   ];
+
+  // Solo mostrar métricas si el usuario es administrador
+  if (user?.rol === 'administrador') {
+    navItems.push({ path: '/metrics', label: 'Métricas', icon: BarChart3 });
+  }
 
   const isActivePath = (path) => location.pathname === path;
 

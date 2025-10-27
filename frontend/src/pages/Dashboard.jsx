@@ -15,10 +15,11 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
+        // Todos los usuarios pueden ver métricas del dashboard
         const [statsResponse, progressResponse, metricsResponse] = await Promise.all([
           carbonAPI.getStats(),
           carbonAPI.getProgress(),
-          metricsAPI.getDashboardMetrics()
+          metricsAPI.getDashboardMetrics() // Disponible para todos
         ]);
         
         setStats(statsResponse.data.stats);
