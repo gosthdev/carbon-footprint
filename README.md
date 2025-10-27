@@ -100,7 +100,6 @@ npm run migrate:force
 # Insertar datos iniciales
 npm run seed              # Contenido educativo (infografías)
 npm run seed:admins       # Crear administradores por defecto
-npm run seed:test-user    # Crear usuario de prueba
 
 � Credenciales por Defecto
 
@@ -117,12 +116,7 @@ Password: Admin456!@#
 Rol: administrador
 ```
 
-### Usuario de Prueba
-```
-Email: test@ejemplo.com
-Password: Test123!@#
-Rol: usuario
-```
+
 
 ⚠️ **IMPORTANTE:** Cambia estas contraseñas después del primer login en producción.
 

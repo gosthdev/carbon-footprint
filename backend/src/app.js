@@ -22,27 +22,25 @@ app.use(helmet({
 }));
 
 // CORS
-// CORS: en desarrollo permitimos algunos orígenes comunes (localhost, 127.0.0.1,
-// y la subred de Docker que suele usar Vite cuando expone network). En producción
-// usamos la URL definida en FRONTEND_URL.
-const allowedFrontend = [
-  process.env.FRONTEND_URL || 'http://localhost:5173',
-  'http://127.0.0.1:5173'
-];
+// Permitir múltiples orígenes: desarrollo local y producción
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+  process.env.FRONTEND_URL // URL de Netlify desde variable de entorno
+].filter(Boolean); // Remover valores undefined
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Si no hay origin (herramientas como curl), permitir
+    // Si no hay origin (herramientas como curl, Postman), permitir
     if (!origin) return callback(null, true);
 
-    // Aceptar orígenes explícitos en la lista
-    if (allowedFrontend.includes(origin)) return callback(null, true);
+    // Verificar si el origin está en la lista permitida
+    if (allowedOrigins.includes(origin)) return callback(null, true);
 
-    // Aceptar orígenes que vienen de la red interna de docker-compose (ej. 172.19.*)
-    // útil cuando Vite muestra "Network: http://172.19.x.x:5173" y el navegador usa esa URL
+    // Permitir orígenes de Docker (desarrollo)
     if (origin.startsWith('http://172.')) return callback(null, true);
 
-    // En producción o si no aplica, rechazar
+    // Rechazar otros orígenes
     return callback(new Error('Origin not allowed by CORS'), false);
   },
   credentials: true
