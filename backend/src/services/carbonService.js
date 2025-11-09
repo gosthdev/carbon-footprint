@@ -95,10 +95,9 @@ class CarbonService {
   }
 
   static getFootprintCategory(totalCO2) {
-    if (totalCO2 < 2000) return { categoria: 'Muy Bajo', color: '#22c55e' };
-    if (totalCO2 < 4000) return { categoria: 'Bajo', color: '#84cc16' };
-    if (totalCO2 < 8000) return { categoria: 'Promedio', color: '#eab308' };
-    if (totalCO2 < 15000) return { categoria: 'Alto', color: '#f97316' };
+    if (totalCO2 < 5000) return { categoria: 'Bajo', color: '#22c55e' };
+    if (totalCO2 < 15000) return { categoria: 'Medio', color: '#eab308' };
+    if (totalCO2 < 30000) return { categoria: 'Alto', color: '#f97316' };
     return { categoria: 'Muy Alto', color: '#ef4444' };
   }
 
