@@ -91,14 +91,14 @@ export default function MetricsPage() {
       icon: TrendingUp,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-100'
-    },
+    }/*,
     {
       title: '% Usuarios que redujeron su huella (respecto al primer registro)',
       value: `${activeUsersMetrics?.percentage_reduced_footprint || 0}%`,
       icon: TrendingDown,
       color: 'text-primary-600',
       bgColor: 'bg-primary-100'
-    }
+    }*/
   ];
 
   return (
