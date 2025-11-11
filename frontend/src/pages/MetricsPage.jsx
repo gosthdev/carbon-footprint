@@ -117,7 +117,7 @@ export default function MetricsPage() {
           <Users className="h-5 w-5" />
           <span>Métricas de Usuarios</span>
         </h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(auto-fit,minmax(220px,1fr))]">
           {userMetricCards.map(({ title, value, icon: Icon, color, bgColor }, index) => (
             <div key={index} className="card">
               <div className="flex items-center justify-between">
